@@ -15,7 +15,7 @@
   },
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development parcel --public-url ./",
+    "dev": "parcel",
     "build": "cross-env NODE_ENV=production parcel build --public-url ./",
     "link-local": "yalc link",
     "watch": "./serve.sh"
