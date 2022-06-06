@@ -1,6 +1,7 @@
 export class Ball {
   constructor() {
-    this.RIGHT_BOUND = 400;
+    this.RIGHT_BOUND = 500;
+    this.LOWER_BOUND = 150;
     this.x = this.RIGHT_BOUND / 2.0;
     this.y = this.LOWER_BOUND / 2.0;
     this.speed = 10;
@@ -9,6 +10,7 @@ export class Ball {
       x: 1.0,
       y: 0.0
     };
+    console.log('START ball x: ' + this.x + ', y: ' + this.y);
   }
 
   update (leftPaddle, rightPaddle) {
@@ -17,6 +19,7 @@ export class Ball {
     }
     this.x += this.velocity.x * this.speed;
     this.y += this.velocity.y * this.speed;
+    console.log('ball x: ' + this.x + ', y: ' + this.y);
     return this.isDone();
   }
 
@@ -28,26 +31,22 @@ export class Ball {
    * @returns {bool} Whether the simulation is done.
    */
   isDone () {
-    return this.ball.x < 0 || this.ball.x > this.RIGHT_BOUND;
-  }
-
-  getRect () {
-    return {
-      x: this.x,
-      y: this.y,
-      width: 3,
-      height: 3
-    }
+    return this.x < 0 || this.x > this.RIGHT_BOUND;
   }
 
   intersect (rect) {
-    return !(rect.x > (this.x + r) ||
+    return !(rect.x > (this.x + this.r) ||
       rect.x + rect.width < this.x ||
       rect.y > this.y + this.r ||
       (rect.y + rect.height) < this.y);
   }
 
   setRandomState () {
-    
+    this.x = this.RIGHT_BOUND / 2.0;
+    this.y = this.LOWER_BOUND / 2.0;
+    this.velocity = {
+      x: 1.0,
+      y: 0.0
+    };
   }
 }

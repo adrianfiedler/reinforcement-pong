@@ -6,10 +6,14 @@ export class Paddle {
    */
   constructor(ball, isAI) {
     // Constants that characterize the system.
-    this.y = 200;
+    this.x = isAI === true ? 50 : 450;
     this.ball = ball;
     this.speed = 10;
     this.isAI = isAI;
+    this.height = 20;
+    this.width = 5;
+    this.screenHeight = 150;
+    this.y = this.screenHeight / 2 - this.height / 2;
   }
 
   /**
@@ -31,11 +35,26 @@ export class Paddle {
    */
   update (action) {
     let movement;
-    if (this.isAI) {
+    if (this.isAI === true) {
       movement = this.ball.y > this.y ? 1 : -1;
     } else {
       movement = action > 0 ? 1 : -1;
     }
     this.y += movement * this.speed;
+    if (this.y < 0) {
+      this.y = 0;
+    }
+    if (this.y > (this.screenHeight - this.height)) {
+      this.y = this.screenHeight - this.height;
+    }
+  }
+
+  getRect () {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height
+    }
   }
 }

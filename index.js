@@ -134,7 +134,7 @@ class PolicyNetwork {
         rightPaddle.update();
         const isDone = ball.update(leftPaddle, rightPaddle);
 
-        await maybeRenderDuringTraining(paddle);
+        await maybeRenderDuringTraining(leftPaddle, rightPaddle, ball);
 
         if (isDone) {
           // When the game ends before max step count is reached, a reward of

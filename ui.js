@@ -65,9 +65,9 @@ function logStatus (message) {
 
 // Objects and functions to support display of cart pole status during training.
 let renderDuringTraining = true;
-export async function maybeRenderDuringTraining (cartPole) {
+export async function maybeRenderDuringTraining (leftPaddle, rightPaddle, ball) {
   if (renderDuringTraining) {
-    renderCartPole(cartPole, cartPoleCanvas);
+    renderCartPole(leftPaddle, rightPaddle, ball, cartPoleCanvas);
     await tf.nextFrame();  // Unblock UI thread.
   }
 }
@@ -154,11 +154,10 @@ function renderCartPole (leftPaddle, rightPaddle, ball, canvas) {
 
   // Draw ball.
   context.beginPath();
-  context.arc(ball.x + ball.radius, ball.y + ball.radius, ball.radius, 0, 2 * Math.PI, false);
-  context.fillStyle = 'green';
-  context.fill();
-  context.lineWidth = 5;
-  context.strokeStyle = '#003300';
+  // context.arc(ball.x + ball.radius, ball.y + ball.radius, ball.radius, 0, 2 * Math.PI, false);
+  context.rect(ball.x, ball.y, ball.r, ball.r);
+  context.lineWidth = 2;
+  context.strokeStyle = '#000000';
   context.stroke();
 }
 
@@ -182,8 +181,8 @@ async function updateUIControlState () {
 
 export async function setUpUI () {
   const ball = new Ball();
-  const leftPaddle = new Paddle(ball);
-  const rightPaddle = new Paddle(ball);
+  const leftPaddle = new Paddle(ball, false);
+  const rightPaddle = new Paddle(ball, true);
 
   if (await SaveablePolicyNetwork.checkStoredModelStatus() != null) {
     policyNet = await SaveablePolicyNetwork.loadModel();
@@ -197,23 +196,23 @@ export async function setUpUI () {
   });
 
   createModelButton.addEventListener('click', async () => {
-    try {
-      const hiddenLayerSizes =
-        hiddenLayerSizesInput.value.trim().split(',').map(v => {
-          const num = Number.parseInt(v.trim());
-          if (!(num > 0)) {
-            throw new Error(
-              `Invalid hidden layer sizes string: ` +
-              `${hiddenLayerSizesInput.value}`);
-          }
-          return num;
-        });
-      policyNet = new SaveablePolicyNetwork(hiddenLayerSizes);
-      console.log('DONE constructing new instance of SaveablePolicyNetwork');
-      await updateUIControlState();
-    } catch (err) {
+    // try {
+    const hiddenLayerSizes =
+      hiddenLayerSizesInput.value.trim().split(',').map(v => {
+        const num = Number.parseInt(v.trim());
+        if (!(num > 0)) {
+          throw new Error(
+            `Invalid hidden layer sizes string: ` +
+            `${hiddenLayerSizesInput.value}`);
+        }
+        return num;
+      });
+    policyNet = new SaveablePolicyNetwork(hiddenLayerSizes);
+    console.log('DONE constructing new instance of SaveablePolicyNetwork');
+    await updateUIControlState();
+    /*} catch (err) {
       logStatus(`ERROR: ${err.message}`);
-    }
+    }*/
   });
 
   deleteStoredModelButton.addEventListener('click', async () => {
@@ -230,62 +229,62 @@ export async function setUpUI () {
     } else {
       disableModelControls();
 
-      try {
-        const trainIterations = Number.parseInt(numIterationsInput.value);
-        if (!(trainIterations > 0)) {
-          throw new Error(`Invalid number of iterations: ${trainIterations}`);
-        }
-        const gamesPerIteration = Number.parseInt(gamesPerIterationInput.value);
-        if (!(gamesPerIteration > 0)) {
-          throw new Error(
-            `Invalid # of games per iterations: ${gamesPerIteration}`);
-        }
-        const maxStepsPerGame = Number.parseInt(maxStepsPerGameInput.value);
-        if (!(maxStepsPerGame > 1)) {
-          throw new Error(`Invalid max. steps per game: ${maxStepsPerGame}`);
-        }
-        const discountRate = Number.parseFloat(discountRateInput.value);
-        if (!(discountRate > 0 && discountRate < 1)) {
-          throw new Error(`Invalid discount rate: ${discountRate}`);
-        }
-        const learningRate = Number.parseFloat(learningRateInput.value);
-
-        logStatus(
-          'Training policy network... Please wait. ' +
-          'Network is saved to IndexedDB at the end of each iteration.');
-        const optimizer = tf.train.adam(learningRate);
-
-        meanStepValues = [];
-        onIterationEnd(0, trainIterations);
-        let t0 = new Date().getTime();
-        stopRequested = false;
-        for (let i = 0; i < trainIterations; ++i) {
-          const gameSteps = await policyNet.train(
-            leftPaddle, rightPaddle, ball, optimizer, discountRate, gamesPerIteration,
-            maxStepsPerGame);
-          const t1 = new Date().getTime();
-          const stepsPerSecond = sum(gameSteps) / ((t1 - t0) / 1e3);
-          t0 = t1;
-          trainSpeed.textContent = `${stepsPerSecond.toFixed(1)} steps/s`
-          meanStepValues.push({ x: i + 1, y: mean(gameSteps) });
-          console.log(`# of tensors: ${tf.memory().numTensors}`);
-          plotSteps();
-          onIterationEnd(i + 1, trainIterations);
-          await tf.nextFrame();  // Unblock UI thread.
-          await policyNet.saveModel();
-          await updateUIControlState();
-
-          if (stopRequested) {
-            logStatus('Training stopped by user.');
-            break;
-          }
-        }
-        if (!stopRequested) {
-          logStatus('Training completed.');
-        }
-      } catch (err) {
-        logStatus(`ERROR: ${err.message}`);
+      // try {
+      const trainIterations = Number.parseInt(numIterationsInput.value);
+      if (!(trainIterations > 0)) {
+        throw new Error(`Invalid number of iterations: ${trainIterations}`);
       }
+      const gamesPerIteration = Number.parseInt(gamesPerIterationInput.value);
+      if (!(gamesPerIteration > 0)) {
+        throw new Error(
+          `Invalid # of games per iterations: ${gamesPerIteration}`);
+      }
+      const maxStepsPerGame = Number.parseInt(maxStepsPerGameInput.value);
+      if (!(maxStepsPerGame > 1)) {
+        throw new Error(`Invalid max. steps per game: ${maxStepsPerGame}`);
+      }
+      const discountRate = Number.parseFloat(discountRateInput.value);
+      if (!(discountRate > 0 && discountRate < 1)) {
+        throw new Error(`Invalid discount rate: ${discountRate}`);
+      }
+      const learningRate = Number.parseFloat(learningRateInput.value);
+
+      logStatus(
+        'Training policy network... Please wait. ' +
+        'Network is saved to IndexedDB at the end of each iteration.');
+      const optimizer = tf.train.adam(learningRate);
+
+      meanStepValues = [];
+      onIterationEnd(0, trainIterations);
+      let t0 = new Date().getTime();
+      stopRequested = false;
+      for (let i = 0; i < trainIterations; ++i) {
+        const gameSteps = await policyNet.train(
+          leftPaddle, rightPaddle, ball, optimizer, discountRate, gamesPerIteration,
+          maxStepsPerGame);
+        const t1 = new Date().getTime();
+        const stepsPerSecond = sum(gameSteps) / ((t1 - t0) / 1e3);
+        t0 = t1;
+        trainSpeed.textContent = `${stepsPerSecond.toFixed(1)} steps/s`
+        meanStepValues.push({ x: i + 1, y: mean(gameSteps) });
+        console.log(`# of tensors: ${tf.memory().numTensors}`);
+        plotSteps();
+        onIterationEnd(i + 1, trainIterations);
+        await tf.nextFrame();  // Unblock UI thread.
+        await policyNet.saveModel();
+        await updateUIControlState();
+
+        if (stopRequested) {
+          logStatus('Training stopped by user.');
+          break;
+        }
+      }
+      if (!stopRequested) {
+        logStatus('Training completed.');
+      }
+      /*} catch (err) {
+        logStatus(`ERROR: ${err.message}`);
+      }*/
       enableModelControls();
     }
   });
