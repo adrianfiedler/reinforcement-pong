@@ -60,6 +60,7 @@ let stopRequested = false;
  */
 function logStatus (message) {
   appStatus.textContent = message;
+  console.log(message);
 }
 
 // Objects and functions to support display of cart pole status during training.

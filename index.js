@@ -132,7 +132,7 @@ class PolicyNetwork {
         const action = this.currentActions_[0];
         leftPaddle.update(action);
         rightPaddle.update();
-        const isDone = ball.update();
+        const isDone = ball.update(leftPaddle, rightPaddle);
 
         await maybeRenderDuringTraining(paddle);
 
