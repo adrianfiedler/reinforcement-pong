@@ -46,4 +46,8 @@ export class Ball {
       rect.y > this.y + this.r ||
       (rect.y + rect.height) < this.y);
   }
+
+  setRandomState () {
+    
+  }
 }
