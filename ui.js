@@ -307,7 +307,7 @@ export async function setUpUI () {
           `Action: ${action === 1 ? '<--' : ' -->'} (Step ${steps})`);
         leftPaddle.update(action);
         rightPaddle.update();
-        isDone = ball.update();
+        isDone = ball.update(leftPaddle, rightPaddle);
         renderCartPole(leftPaddle, rightPaddle, ball, cartPoleCanvas);
       });
       await tf.nextFrame();  // Unblock UI thread.
