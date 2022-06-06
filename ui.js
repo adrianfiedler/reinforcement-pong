@@ -234,7 +234,9 @@ async function updateUIControlState () {
 }
 
 export async function setUpUI () {
-  const cartPole = new CartPole(true);
+  const ball = new Ball();
+  const leftPaddle = new Paddle(ball);
+  const rightPaddle = new Paddle(ball);
 
   if (await SaveablePolicyNetwork.checkStoredModelStatus() != null) {
     policyNet = await SaveablePolicyNetwork.loadModel();
@@ -344,19 +346,23 @@ export async function setUpUI () {
   testButton.addEventListener('click', async () => {
     disableModelControls();
     let isDone = false;
-    const paddle = new Paddle(new Ball());
-    paddle.setRandomState();
+    const ball = new Ball();
+    const leftPaddle = new Paddle(ball, false);
+    const rightPaddle = new Paddle(ball, true);
+    leftPaddle.setRandomState();
     let steps = 0;
     stopRequested = false;
     while (!isDone) {
       steps++;
       tf.tidy(() => {
-        const action = policyNet.getActions(paddle.getStateTensor())[0];
+        const action = policyNet.getActions(leftPaddle.getStateTensor())[0];
         logStatus(
           `Test in progress. ` +
           `Action: ${action === 1 ? '<--' : ' -->'} (Step ${steps})`);
-        isDone = paddle.update(action);
-        renderCartPole(paddle, cartPoleCanvas);
+        leftPaddle.update(action);
+        rightPaddle.update();
+        isDone = ball.update();
+        renderCartPole(leftPaddle, rightPaddle, ball, cartPoleCanvas);
       });
       await tf.nextFrame();  // Unblock UI thread.
       if (stopRequested) {

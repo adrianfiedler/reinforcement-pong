@@ -37,15 +37,5 @@ export class Paddle {
       movement = action > 0 ? 1 : -1;
     }
     this.y += movement * this.speed;
-
-    return this.isDone();
-  }
-
-  /**
-   * Determine whether this simulation is done.
-   * @returns {bool} Whether the simulation is done.
-   */
-  isDone () {
-    return this.ball.isDone();
   }
 }
