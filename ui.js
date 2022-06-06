@@ -314,7 +314,7 @@ export async function setUpUI () {
         stopRequested = false;
         for (let i = 0; i < trainIterations; ++i) {
           const gameSteps = await policyNet.train(
-            paddle, optimizer, discountRate, gamesPerIteration,
+            leftPaddle, rightPaddle, ball, optimizer, discountRate, gamesPerIteration,
             maxStepsPerGame);
           const t1 = new Date().getTime();
           const stepsPerSecond = sum(gameSteps) / ((t1 - t0) / 1e3);

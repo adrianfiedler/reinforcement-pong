@@ -83,7 +83,7 @@ class PolicyNetwork {
         units: hiddenLayerSize,
         activation: 'elu',
         // `inputShape` is required only for the first layer.
-        inputShape: i === 0 ? [4] : undefined
+        inputShape: i === 0 ? [5] : undefined
       }));
     });
     // The last layer has only one unit. The single output number will be
@@ -107,14 +107,16 @@ class PolicyNetwork {
    *   in this round of training.
    */
   async train (
-    paddle, optimizer, discountRate, numGames, maxStepsPerGame) {
+    leftPaddle, rightPaddle, ball, optimizer, discountRate, numGames, maxStepsPerGame) {
     const allGradients = [];
     const allRewards = [];
     const gameSteps = [];
     onGameEnd(0, numGames);
     for (let i = 0; i < numGames; ++i) {
       // Randomly initialize the state of  paddle m at the beginning of every game.
-      paddle.setRandomState();
+      leftPaddle.setRandomState();
+      rightPaddle.setRandomState();
+      ball.setRandomState();
       const gameRewards = [];
       const gameGradients = [];
       for (let j = 0; j < maxStepsPerGame; ++j) {
@@ -122,13 +124,15 @@ class PolicyNetwork {
         // network's weights with respect to the probability of the action
         // choice that lead to the reward.
         const gradients = tf.tidy(() => {
-          const inputTensor = paddle.getStateTensor();
+          const inputTensor = leftPaddle.getStateTensor();
           return this.getGradientsAndSaveActions(inputTensor).grads;
         });
 
         this.pushGradients(gameGradients, gradients);
         const action = this.currentActions_[0];
-        const isDone = paddle.update(action);
+        leftPaddle.update(action);
+        rightPaddle.update();
+        const isDone = ball.update();
 
         await maybeRenderDuringTraining(paddle);
 
