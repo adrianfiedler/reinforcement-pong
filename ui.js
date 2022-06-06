@@ -18,10 +18,11 @@
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import embed from 'vega-embed';
+import { Ball } from './ball';
 
-import {CartPole} from './cart_pole';
-import {SaveablePolicyNetwork} from './index';
-import {mean, sum} from './utils';
+import { Paddle } from './paddle';
+import { SaveablePolicyNetwork } from './index';
+import { mean, sum } from './utils';
 
 const appStatus = document.getElementById('app-status');
 const storedModelStatusInput = document.getElementById('stored-model-status');
@@ -36,7 +37,7 @@ const discountRateInput = document.getElementById('discount-rate');
 const maxStepsPerGameInput = document.getElementById('max-steps-per-game');
 const learningRateInput = document.getElementById('learning-rate');
 const renderDuringTrainingCheckbox =
-    document.getElementById('render-during-training');
+  document.getElementById('render-during-training');
 
 const trainButton = document.getElementById('train');
 const testButton = document.getElementById('test');
@@ -57,13 +58,13 @@ let stopRequested = false;
  *
  * @param {string} message The message to be displayed.
  */
-function logStatus(message) {
+function logStatus (message) {
   appStatus.textContent = message;
 }
 
 // Objects and functions to support display of cart pole status during training.
 let renderDuringTraining = true;
-export async function maybeRenderDuringTraining(cartPole) {
+export async function maybeRenderDuringTraining (cartPole) {
   if (renderDuringTraining) {
     renderCartPole(cartPole, cartPoleCanvas);
     await tf.nextFrame();  // Unblock UI thread.
@@ -78,7 +79,7 @@ export async function maybeRenderDuringTraining(cartPole) {
  * @param {number} totalGames Total number of games to complete in the current
  *   iteration of training.
  */
-export function onGameEnd(gameCount, totalGames) {
+export function onGameEnd (gameCount, totalGames) {
   iterationStatus.textContent = `Game ${gameCount} of ${totalGames}`;
   iterationProgress.value = gameCount / totalGames * 100;
   if (gameCount === totalGames) {
@@ -94,15 +95,15 @@ export function onGameEnd(gameCount, totalGames) {
  * @param {*} totalIterations Total number of iterations to complete in the
  *   current round of training.
  */
-function onIterationEnd(iterationCount, totalIterations) {
+function onIterationEnd (iterationCount, totalIterations) {
   trainStatus.textContent = `Iteration ${iterationCount} of ${totalIterations}`;
   trainProgress.value = iterationCount / totalIterations * 100;
 }
 
 // Objects and function to support the plotting of game steps during training.
 let meanStepValues = [];
-function plotSteps() {
-  tfvis.render.linechart(stepsContainer, {values: meanStepValues}, {
+function plotSteps () {
+  tfvis.render.linechart(stepsContainer, { values: meanStepValues }, {
     xLabel: 'Training Iteration',
     yLabel: 'Mean Steps Per Game',
     width: 400,
@@ -110,13 +111,13 @@ function plotSteps() {
   });
 }
 
-function disableModelControls() {
+function disableModelControls () {
   trainButton.textContent = 'Stop';
   testButton.disabled = true;
   deleteStoredModelButton.disabled = true;
 }
 
-function enableModelControls() {
+function enableModelControls () {
   trainButton.textContent = 'Train';
   testButton.disabled = false;
   deleteStoredModelButton.disabled = false;
@@ -129,7 +130,7 @@ function enableModelControls() {
  * @param {HTMLCanvasElement} canvas The instance of HTMLCanvasElement on which
  *   the rendering will happen.
  */
-function renderCartPole(cartPole, canvas) {
+function renderCartPole (cartPole, canvas) {
   if (!canvas.style.display) {
     canvas.style.display = 'block';
   }
@@ -161,17 +162,17 @@ function renderCartPole(cartPole, canvas) {
     context.beginPath();
     context.lineWidth = 2;
     context.arc(
-        cartX - cartW / 4 * offsetX, railY + cartH / 2 + wheelRadius,
-        wheelRadius, 0, 2 * Math.PI);
+      cartX - cartW / 4 * offsetX, railY + cartH / 2 + wheelRadius,
+      wheelRadius, 0, 2 * Math.PI);
     context.stroke();
   }
 
   // Draw the pole.
   const angle = cartPole.theta + Math.PI / 2;
   const poleTopX =
-      halfW + scale * (cartPole.x + Math.cos(angle) * cartPole.length);
+    halfW + scale * (cartPole.x + Math.cos(angle) * cartPole.length);
   const poleTopY = railY -
-      scale * (cartPole.cartHeight / 2 + Math.sin(angle) * cartPole.length);
+    scale * (cartPole.cartHeight / 2 + Math.sin(angle) * cartPole.length);
   context.beginPath();
   context.strokeStyle = '#ffa500';
   context.lineWidth = 6;
@@ -214,7 +215,7 @@ function renderCartPole(cartPole, canvas) {
   context.stroke();
 }
 
-async function updateUIControlState() {
+async function updateUIControlState () {
   const modelInfo = await SaveablePolicyNetwork.checkStoredModelStatus();
   if (modelInfo == null) {
     storedModelStatusInput.value = 'No stored model.';
@@ -232,7 +233,7 @@ async function updateUIControlState() {
   renderDuringTrainingCheckbox.checked = renderDuringTraining;
 }
 
-export async function setUpUI() {
+export async function setUpUI () {
   const cartPole = new CartPole(true);
 
   if (await SaveablePolicyNetwork.checkStoredModelStatus() != null) {
@@ -249,15 +250,15 @@ export async function setUpUI() {
   createModelButton.addEventListener('click', async () => {
     try {
       const hiddenLayerSizes =
-          hiddenLayerSizesInput.value.trim().split(',').map(v => {
-            const num = Number.parseInt(v.trim());
-            if (!(num > 0)) {
-              throw new Error(
-                  `Invalid hidden layer sizes string: ` +
-                  `${hiddenLayerSizesInput.value}`);
-            }
-            return num;
-          });
+        hiddenLayerSizesInput.value.trim().split(',').map(v => {
+          const num = Number.parseInt(v.trim());
+          if (!(num > 0)) {
+            throw new Error(
+              `Invalid hidden layer sizes string: ` +
+              `${hiddenLayerSizesInput.value}`);
+          }
+          return num;
+        });
       policyNet = new SaveablePolicyNetwork(hiddenLayerSizes);
       console.log('DONE constructing new instance of SaveablePolicyNetwork');
       await updateUIControlState();
@@ -288,7 +289,7 @@ export async function setUpUI() {
         const gamesPerIteration = Number.parseInt(gamesPerIterationInput.value);
         if (!(gamesPerIteration > 0)) {
           throw new Error(
-              `Invalid # of games per iterations: ${gamesPerIteration}`);
+            `Invalid # of games per iterations: ${gamesPerIteration}`);
         }
         const maxStepsPerGame = Number.parseInt(maxStepsPerGameInput.value);
         if (!(maxStepsPerGame > 1)) {
@@ -301,8 +302,8 @@ export async function setUpUI() {
         const learningRate = Number.parseFloat(learningRateInput.value);
 
         logStatus(
-            'Training policy network... Please wait. ' +
-            'Network is saved to IndexedDB at the end of each iteration.');
+          'Training policy network... Please wait. ' +
+          'Network is saved to IndexedDB at the end of each iteration.');
         const optimizer = tf.train.adam(learningRate);
 
         meanStepValues = [];
@@ -311,13 +312,13 @@ export async function setUpUI() {
         stopRequested = false;
         for (let i = 0; i < trainIterations; ++i) {
           const gameSteps = await policyNet.train(
-              cartPole, optimizer, discountRate, gamesPerIteration,
-              maxStepsPerGame);
+            paddle, optimizer, discountRate, gamesPerIteration,
+            maxStepsPerGame);
           const t1 = new Date().getTime();
           const stepsPerSecond = sum(gameSteps) / ((t1 - t0) / 1e3);
           t0 = t1;
           trainSpeed.textContent = `${stepsPerSecond.toFixed(1)} steps/s`
-          meanStepValues.push({x: i + 1, y: mean(gameSteps)});
+          meanStepValues.push({ x: i + 1, y: mean(gameSteps) });
           console.log(`# of tensors: ${tf.memory().numTensors}`);
           plotSteps();
           onIterationEnd(i + 1, trainIterations);
@@ -343,19 +344,19 @@ export async function setUpUI() {
   testButton.addEventListener('click', async () => {
     disableModelControls();
     let isDone = false;
-    const cartPole = new CartPole(true);
-    cartPole.setRandomState();
+    const paddle = new Paddle(new Ball());
+    paddle.setRandomState();
     let steps = 0;
     stopRequested = false;
     while (!isDone) {
       steps++;
       tf.tidy(() => {
-        const action = policyNet.getActions(cartPole.getStateTensor())[0];
+        const action = policyNet.getActions(paddle.getStateTensor())[0];
         logStatus(
-            `Test in progress. ` +
-            `Action: ${action === 1 ? '<--' : ' -->'} (Step ${steps})`);
-        isDone = cartPole.update(action);
-        renderCartPole(cartPole, cartPoleCanvas);
+          `Test in progress. ` +
+          `Action: ${action === 1 ? '<--' : ' -->'} (Step ${steps})`);
+        isDone = paddle.update(action);
+        renderCartPole(paddle, cartPoleCanvas);
       });
       await tf.nextFrame();  // Unblock UI thread.
       if (stopRequested) {
