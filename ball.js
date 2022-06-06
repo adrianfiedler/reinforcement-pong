@@ -10,16 +10,17 @@ export class Ball {
       x: 1.0,
       y: 0.0
     };
-    console.log('START ball x: ' + this.x + ', y: ' + this.y);
   }
 
   update (leftPaddle, rightPaddle) {
+    if ((this.y <= 0 && this.velocity.y < 0) || (this.y >= this.LOWER_BOUND && this.velocity.y > 0)) {
+      this.velocity.y *= -1;
+    }
     if (this.intersect(leftPaddle.getRect()) || this.intersect(rightPaddle.getRect())) {
       this.velocity.x *= -1;
     }
     this.x += this.velocity.x * this.speed;
     this.y += this.velocity.y * this.speed;
-    console.log('ball x: ' + this.x + ', y: ' + this.y);
     return this.isDone();
   }
 
@@ -43,10 +44,10 @@ export class Ball {
 
   setRandomState () {
     this.x = this.RIGHT_BOUND / 2.0;
-    this.y = this.LOWER_BOUND / 2.0;
+    this.y = Math.random() * this.LOWER_BOUND;
     this.velocity = {
-      x: 1.0,
-      y: 0.0
+      x: -1.0,
+      y: Math.random() - 0.5
     };
   }
 }

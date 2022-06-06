@@ -6,7 +6,7 @@ export class Paddle {
    */
   constructor(ball, isAI) {
     // Constants that characterize the system.
-    this.x = isAI === true ? 50 : 450;
+    this.x = isAI === true ? 450 : 50;
     this.ball = ball;
     this.speed = 10;
     this.isAI = isAI;
@@ -24,7 +24,7 @@ export class Paddle {
   }
 
   setRandomState () {
-    this.y = 200;
+    this.y = Math.random() * (this.screenHeight - this.height);
   }
 
   /**
@@ -36,11 +36,14 @@ export class Paddle {
   update (action) {
     let movement;
     if (this.isAI === true) {
-      movement = this.ball.y > this.y ? 1 : -1;
+      // movement = (this.ball.y > this.y) ? -1 : 1;
+      this.y = this.ball.y;
     } else {
-      movement = action > 0 ? 1 : -1;
+      movement = (action > 0) ? 1 : -1;
+      this.y += (movement * this.speed);
+      console.log('action is: ' + action);
     }
-    this.y += movement * this.speed;
+    
     if (this.y < 0) {
       this.y = 0;
     }
