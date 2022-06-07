@@ -81,7 +81,7 @@ class PolicyNetwork {
     hiddenLayerSizes.forEach((hiddenLayerSize, i) => {
       this.policyNet.add(tf.layers.dense({
         units: hiddenLayerSize,
-        activation: 'elu',
+        activation: 'sigmoid',
         // `inputShape` is required only for the first layer.
         inputShape: i === 0 ? [5] : undefined
       }));
@@ -175,6 +175,14 @@ class PolicyNetwork {
       // algorithm.)
       optimizer.applyGradients(
         scaleAndAverageGradients(allGradients, normalizedRewards));
+      const sortedRewards = normalizedRewards.sort( (rew1, rew2) => {return rew1.size - rew2.size});
+      const bestRewards = sortedRewards[sortedRewards.length-1].dataSync();
+      let sumBestRewards = 0;
+      for(let i = 0; i < bestRewards.length; i++){
+        sumBestRewards += bestRewards[i];
+      }
+      console.log('bestRewards', bestRewards);
+      console.log('bestRewardSum2', sumBestRewards);
     });
     tf.dispose(allGradients);
     return gameSteps;

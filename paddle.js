@@ -10,8 +10,9 @@ export class Paddle {
     this.ball = ball;
     this.speed = 10;
     this.isAI = isAI;
-    this.height = 20;
+    this.height = 10;
     this.width = 5;
+    this.screenWidth = 500;
     this.screenHeight = 150;
     this.y = this.screenHeight / 2 - this.height / 2;
   }
@@ -20,7 +21,8 @@ export class Paddle {
    * Get current state as a tf.Tensor of shape [1, 4].
    */
   getStateTensor () {
-    return tf.tensor2d([[this.y, this.ball.x, this.ball.y, this.ball.velocity.x, this.ball.velocity.y]]);
+    let state = tf.tensor2d([[this.y/this.screenHeight, this.ball.x/this.screenWidth, this.ball.y/this.screenHeight, this.ball.velocity.x, this.ball.velocity.y]]);
+    return state;
   }
 
   setRandomState () {
@@ -41,7 +43,6 @@ export class Paddle {
     } else {
       movement = (action > 0) ? 1 : -1;
       this.y += (movement * this.speed);
-      console.log('action is: ' + action);
     }
     
     if (this.y < 0) {

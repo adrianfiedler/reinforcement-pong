@@ -3,12 +3,12 @@ export class Ball {
     this.RIGHT_BOUND = 500;
     this.LOWER_BOUND = 150;
     this.x = this.RIGHT_BOUND / 2.0;
-    this.y = this.LOWER_BOUND / 2.0;
+    this.y = Math.random() * this.LOWER_BOUND;
     this.speed = 10;
     this.r = 3;
     this.velocity = {
-      x: 1.0,
-      y: 0.0
+      x: -1.0,
+      y: Math.random() - 0.5
     };
   }
 

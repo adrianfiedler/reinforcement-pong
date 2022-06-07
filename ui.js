@@ -301,10 +301,11 @@ export async function setUpUI () {
     while (!isDone) {
       steps++;
       tf.tidy(() => {
-        const action = policyNet.getActions(leftPaddle.getStateTensor())[0];
+        const actions = policyNet.getActions(leftPaddle.getStateTensor());
+        const action = actions[0];
         logStatus(
           `Test in progress. ` +
-          `Action: ${action === 1 ? '<--' : ' -->'} (Step ${steps})`);
+          `Action: ${action === 1 ? 'DOWN' : 'UP'} (Step ${steps})`);
         leftPaddle.update(action);
         rightPaddle.update();
         isDone = ball.update(leftPaddle, rightPaddle);
