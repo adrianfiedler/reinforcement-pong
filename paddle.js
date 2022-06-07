@@ -21,7 +21,7 @@ export class Paddle {
    * Get current state as a tf.Tensor of shape [1, 4].
    */
   getStateTensor () {
-    let state = tf.tensor2d([[this.y/this.screenHeight, this.ball.x/this.screenWidth, this.ball.y/this.screenHeight, this.ball.velocity.x, this.ball.velocity.y]]);
+    let state = tf.tensor2d([[this.y / this.screenHeight, this.ball.y / this.screenHeight, this.ball.velocity.x, this.ball.velocity.y]]);
     return state;
   }
 
@@ -44,7 +44,7 @@ export class Paddle {
       movement = (action > 0) ? 1 : -1;
       this.y += (movement * this.speed);
     }
-    
+
     if (this.y < 0) {
       this.y = 0;
     }
