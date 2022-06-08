@@ -48,7 +48,6 @@ export class Paddle {
       this.y += (movement * this.speed);
       // this.y = this.ball.y;
     } else {
-      console.log('action: ' + action);
       movement = (action > 0) ? 1 : -1;
       this.y += (movement * this.speed);
     }
