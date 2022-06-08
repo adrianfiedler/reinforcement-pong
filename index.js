@@ -81,7 +81,7 @@ class PolicyNetwork {
     hiddenLayerSizes.forEach((hiddenLayerSize, i) => {
       this.policyNet.add(tf.layers.dense({
         units: hiddenLayerSize,
-        activation: 'sigmoid',
+        activation: 'elu',
         // `inputShape` is required only for the first layer.
         inputShape: i === 0 ? [4] : undefined
       }));
