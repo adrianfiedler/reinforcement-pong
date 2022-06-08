@@ -83,7 +83,7 @@ class PolicyNetwork {
         units: hiddenLayerSize,
         activation: 'elu',
         // `inputShape` is required only for the first layer.
-        inputShape: i === 0 ? [4] : undefined
+        inputShape: i === 0 ? [2] : undefined
       }));
     });
     // The last layer has only one unit. The single output number will be
@@ -139,13 +139,22 @@ class PolicyNetwork {
         if (isDone) {
           // When the game ends before max step count is reached, a reward of
           // 0 is given.
-          gameRewards.push(0);
+          if(ball.x < 49) {
+            // lost
+            gameRewards.push(-5);
+            console.log('LOST -5');
+           
+          } else {
+            // won
+            gameRewards.push(5);
+            console.log('WON +5');
+          }
           break;
         } else {
           // As long as the game doesn't end, each step leads to a reward of 1.
           // These reward values will later be "discounted", leading to
           // higher reward values for longer-lasting games.
-          gameRewards.push(1);
+          gameRewards.push(0);
         }
       }
       onGameEnd(i + 1, numGames);
@@ -181,8 +190,6 @@ class PolicyNetwork {
       for (let i = 0; i < bestRewards.length; i++) {
         sumBestRewards += bestRewards[i];
       }
-      console.log('bestRewards', bestRewards);
-      console.log('bestRewardSum2', sumBestRewards);
     });
     tf.dispose(allGradients);
     return gameSteps;

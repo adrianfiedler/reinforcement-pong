@@ -6,9 +6,15 @@ export class Paddle {
    */
   constructor(ball, isAI) {
     // Constants that characterize the system.
-    this.x = isAI === true ? 450 : 50;
     this.ball = ball;
-    this.speed = 10;
+    if(isAI === true) {
+      this.x = 450;
+      this.speed = 1;
+    } else {
+      this.x = 50;
+      this.speed = 10;
+    }
+    
     this.isAI = isAI;
     this.height = 10;
     this.width = 5;
@@ -21,7 +27,7 @@ export class Paddle {
    * Get current state as a tf.Tensor of shape [1, 4].
    */
   getStateTensor () {
-    let state = tf.tensor2d([[this.y / this.screenHeight, this.ball.y / this.screenHeight, this.ball.velocity.x, this.ball.velocity.y]]);
+    let state = tf.tensor2d([[this.y/this.screenHeight, this.ball.y/this.screenHeight]]);
     return state;
   }
 
@@ -38,9 +44,11 @@ export class Paddle {
   update (action) {
     let movement;
     if (this.isAI === true) {
-      // movement = (this.ball.y > this.y) ? -1 : 1;
-      this.y = this.ball.y;
+      movement = (this.ball.y > this.y) ? 1 : -1;
+      this.y += (movement * this.speed);
+      // this.y = this.ball.y;
     } else {
+      console.log('action: ' + action);
       movement = (action > 0) ? 1 : -1;
       this.y += (movement * this.speed);
     }

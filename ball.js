@@ -32,7 +32,7 @@ export class Ball {
    * @returns {bool} Whether the simulation is done.
    */
   isDone () {
-    return this.x < 0 || this.x > this.RIGHT_BOUND;
+    return this.x < 49 || this.x > 455;
   }
 
   intersect (rect) {
