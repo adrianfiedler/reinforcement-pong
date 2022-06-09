@@ -9,7 +9,7 @@ export class Paddle {
     this.ball = ball;
     if(isAI === true) {
       this.x = 450;
-      this.speed = 1;
+      this.speed = 3;
     } else {
       this.x = 50;
       this.speed = 7;
