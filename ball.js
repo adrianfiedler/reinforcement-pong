@@ -4,12 +4,13 @@ export class Ball {
     this.LOWER_BOUND = 150;
     this.x = this.RIGHT_BOUND / 2.0;
     this.y = Math.random() * this.LOWER_BOUND;
-    this.speed = 10;
+    this.speed = 6;
     this.r = 3;
     this.velocity = {
       x: -1.0,
       y: Math.random() - 0.5
     };
+    this.playerHit = false;
   }
 
   update (leftPaddle, rightPaddle) {
@@ -17,7 +18,12 @@ export class Ball {
       this.velocity.y *= -1;
     }
     if (this.intersect(leftPaddle.getRect()) || this.intersect(rightPaddle.getRect())) {
-      this.velocity.x *= -1;
+      this.velocity.x = -1;
+      if(this.intersect(leftPaddle.getRect())) {
+        this.velocity.x = 1;
+        this.playerHit = true;
+        console.log('player hit');
+      }
     }
     this.x += this.velocity.x * this.speed;
     this.y += this.velocity.y * this.speed;
@@ -32,7 +38,7 @@ export class Ball {
    * @returns {bool} Whether the simulation is done.
    */
   isDone () {
-    return this.x < 49 || this.x > 455;
+    return this.x < 49 || this.x > 455 || this.playerHit === true;
   }
 
   intersect (rect) {
@@ -49,5 +55,6 @@ export class Ball {
       x: -1.0,
       y: Math.random() - 0.5
     };
+    this.playerHit = false;
   }
 }

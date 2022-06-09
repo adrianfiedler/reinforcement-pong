@@ -12,12 +12,12 @@ export class Paddle {
       this.speed = 1;
     } else {
       this.x = 50;
-      this.speed = 10;
+      this.speed = 7;
     }
     
     this.isAI = isAI;
-    this.height = 10;
-    this.width = 5;
+    this.height = 16;
+    this.width = 8;
     this.screenWidth = 500;
     this.screenHeight = 150;
     this.y = this.screenHeight / 2 - this.height / 2;
@@ -27,7 +27,7 @@ export class Paddle {
    * Get current state as a tf.Tensor of shape [1, 4].
    */
   getStateTensor () {
-    let state = tf.tensor2d([[this.y/this.screenHeight, this.ball.y/this.screenHeight]]);
+    let state = tf.tensor2d([[this.y / this.screenHeight, this.ball.y/this.screenHeight, this.getYDistToBall()]]);
     return state;
   }
 
@@ -67,5 +67,10 @@ export class Paddle {
       width: this.width,
       height: this.height
     }
+  }
+
+  getYDistToBall() {
+    const distY = ((this.y + this.height /2.0) - (this.ball.y + this.ball.r / 2.0)) / this.screenHeight; 
+    return distY;
   }
 }
